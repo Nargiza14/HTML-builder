@@ -18,8 +18,15 @@ const rl = readline.createInterface({
 });
 
 rl.on("pause", () => {
-  console.log("Readline paused.");
+  console.log("Bye!");
 }).on("SIGINT", () => {
   console.log("Have a great day!");
   process.exit(0);
+});
+
+rl.on("line", (input) => {
+  if (input === "exit") {
+    console.log("Have a great day!");
+    rl.close();
+  }
 });
