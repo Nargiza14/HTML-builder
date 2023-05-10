@@ -1,32 +1,26 @@
 const fs = require("fs");
-const readline = require("readline");
 const path = require("path");
 
-const writeStream = () => {
-  fs.createWriteStream(path.join(__dirname + `/text.txt`), (err) => {
-    if (err) {
-      console.log("Error!");
-    }
-  });
-};
+const writeStream = fs.createWriteStream(
+  path.join(__dirname, "text.txt"),
+  "utf8"
+);
 
-console.log("Hi! Let's write something!");
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
+process.stdout.write("Hi! Let's write something!\n");
+process.on("SIGINT", () => {
+  process.stdout.write("Have a great day!");
+  process.exit();
 });
 
-rl.on("pause", () => {
-  console.log("Bye!");
-}).on("SIGINT", () => {
-  console.log("Have a great day!");
-  process.exit(0);
-});
-
-rl.on("line", (input) => {
-  if (input === "exit") {
-    console.log("Have a great day!");
-    rl.close();
+process.stdin.on("data", function (data) {
+  if (data.toString().trim() === "exit") {
+    process.stdout.write("Have a great day!");
+    process.exit();
+  } else {
+    writeStream.write(data, "utf8");
+    process.on("SIGINT", () => {
+      process.stdout.write("Have a great day!");
+      process.exit();
+    });
   }
 });

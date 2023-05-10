@@ -120,7 +120,10 @@ fs.readdir(
     if (err) throw err;
     else {
       filenames.forEach((filename, index) => {
-        const cssPath = path.join(__dirname + "/styles", filename.name);
+        const cssPath = path.join(
+          path.join(__dirname + "/styles"),
+          filename.name
+        );
         if (filename.isFile() && filename.name.split(".")[1] === "css") {
           fs.readFile(cssPath, "utf8", (err, data) => {
             if (err) {
