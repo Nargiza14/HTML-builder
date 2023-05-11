@@ -1,23 +1,25 @@
 const fs = require("fs");
 const path = require("path");
 
-fs.mkdir(
-  path.join(__dirname + "/files-copy"),
-  { recursive: true },
-  function copyDir(err) {
-    if (err) throw err;
-    console.log("Clone folder");
-    fs.readdir(path.join(__dirname + "/files"), "utf8", function (error, data) {
-      for (const key in data) {
-        fs.copyFile(
-          path.join(__dirname + "/files" + "/" + data[key]),
-          path.join(__dirname + "/files-copy" + "/" + data[key]),
-          (err) => {
-            if (err) throw err;
-            console.log("Done!");
-          }
-        );
-      }
-    });
+async function copyDir(src, destination) {
+  await fs.promises.mkdir(destination, { recursive: true });
+  let files = await fs.promises.readdir(src, { withFileTypes: true });
+  for (let file of files) {
+    const srcPath = path.join(src, file.name);
+    const destPath = path.join(destination, file.name);
+    if (file.isDirectory()) {
+      await copyDir(srcPath, destPath);
+    } else {
+      await fs.promises.copyFile(srcPath, destPath);
+    }
   }
+}
+function copyDirection(src, destination) {
+  fs.rm(destination, { recursive: true, force: true }, function () {
+    copyDir(src, destination);
+  });
+}
+copyDirection(
+  path.join(__dirname, "/files"),
+  path.join(__dirname, "/files-copy")
 );
